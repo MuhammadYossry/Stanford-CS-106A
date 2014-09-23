@@ -15,13 +15,16 @@ public class Hangman extends ConsoleProgram {
 
     public void run() {
        RandomGenerator rg = RandomGenerator.getInstance();
-	   String word = getWord(rg.nextInt(0, getWordCount() - 1));		
+       HangmanLexicon hl = new HangmanLexicon();
+       canvas.reset();
+	   String word = hl.getWord(rg.nextInt(0, hl.getWordCount() - 1));		
 	   int gusses_left = 8;
 	   int right_gusses = 0;
 	   String dashed_word = getDashedString(word);
 	   println("Welcome to Hangman!");
 	   while(true){
 		   println("The word now Looks like: " + dashed_word);
+		   canvas.displayWord(dashed_word);
 		   println("You have " + gusses_left + " left");
 		   String input = readLine("Your guess: ");
 		   int char_index = 0;
@@ -42,6 +45,7 @@ public class Hangman extends ConsoleProgram {
 			   dashed_word = changeChar(dashed_word, char_index, word.charAt(char_index));
 			   right_gusses++;
 		   }else {
+			   canvas.noteIncorrectGuess(input.toUpperCase().charAt(0));
 			   gusses_left--;
 		   }
 		   if(right_gusses >= word.length()){
@@ -68,26 +72,9 @@ public class Hangman extends ConsoleProgram {
     	}
     	return dashed;
     }
-
-/** Returns the number of words in the lexicon. */
-	public int getWordCount() {
-		return 10;
-	}
-
-/** Returns the word at the specified index. */
-	public String getWord(int index) {
-		switch (index) {
-			case 0: return "BUOY";
-			case 1: return "COMPUTER";
-			case 2: return "CONNOISSEUR";
-			case 3: return "DEHYDRATE";
-			case 4: return "FUZZY";
-			case 5: return "HUBBUB";
-			case 6: return "KEYHOLE";
-			case 7: return "QUAGMIRE";
-			case 8: return "SLITHER";
-			case 9: return "ZIRCON";
-			default: throw new ErrorException("getWord: Illegal index");
-		}
+    public void init() {
+        canvas = new HangmanCanvas();
+    	add(canvas);
     }
+    private HangmanCanvas canvas;
 }

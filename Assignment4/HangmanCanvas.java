@@ -7,10 +7,13 @@
 import acm.graphics.*;
 
 public class HangmanCanvas extends GCanvas {
+	
 
 /** Resets the display so that only the scaffold appears */
 	public void reset() {
-		/* You fill this in */
+		removeAll();
+		incorrectGuess = "";
+		drawScaffold();
 	}
 
 /**
@@ -19,7 +22,11 @@ public class HangmanCanvas extends GCanvas {
  * been guessed so far; unguessed letters are indicated by hyphens.
  */
 	public void displayWord(String word) {
-		/* You fill this in */
+		if(this.word != null)
+			remove(this.word);
+		this.word = new GLabel(word, getWidth() * 0.15, getHeight() * 0.85);
+		this.word.setFont("London-30");
+		add(this.word);
 	}
 
 /**
@@ -30,8 +37,140 @@ public class HangmanCanvas extends GCanvas {
  */
 	public void noteIncorrectGuess(char letter) {
 		/* You fill this in */
+		incorrectGuess += letter;
+		if(this.incorrectWord != null)
+			remove(this.incorrectWord);
+		this.incorrectWord = new GLabel(incorrectGuess, getWidth() * 0.15, getHeight() * 0.90);
+		this.incorrectWord.setFont("Arial-16");
+		add(this.incorrectWord);
+		punishPlayer();
+	}
+	
+	private void punishPlayer(){
+		switch (incorrectGuess.length()) {
+		case 1:
+			drawHead();
+			break;
+		case 2:
+			drawBody();
+			break;
+		case 3:
+			drawLeftArm();
+			break;
+		case 4:
+			drawRightArm();
+			break;
+		case 5:
+			drawLeftLeg();
+			break;
+		case 6:
+			drawRightLeg();
+			break;
+		case 7:
+			drawLeftFoot();
+			break;
+		case 8:
+			drawRightFoot();
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	private void drawScaffold() {
+		double scaffoldTopX = getWidth()/2 - UPPER_ARM_LENGTH;
+		double scaffoldTopY = getHeight()/2 - BODY_LENGTH - HEAD_RADIUS*2 - ROPE_LENGTH;
+		double scaffoldBottomY = scaffoldTopY + SCAFFOLD_HEIGHT;
+		GLine scaffold= new GLine (scaffoldTopX, scaffoldTopY, scaffoldTopX, scaffoldBottomY);
+		add(scaffold);
+		double beamRightX = scaffoldTopX + BEAM_LENGTH;
+		GLine beam = new GLine(scaffoldTopX, scaffoldTopY, beamRightX, scaffoldTopY);
+		add(beam);
+		double ropeBottomY = scaffoldTopY + ROPE_LENGTH;
+		GLine rope = new GLine (beamRightX, scaffoldTopY, beamRightX, ropeBottomY);
+		add(rope);
+	}
+	
+	private void drawHead() {
+		double x = getWidth()/2 - UPPER_ARM_LENGTH + BEAM_LENGTH - HEAD_RADIUS;
+		double y = getHeight()/2 - BODY_LENGTH - HEAD_RADIUS*2;
+		GOval head = new GOval (x, y, HEAD_RADIUS*2, HEAD_RADIUS*2);
+		add(head);
+	}
+	
+	private void drawBody() {
+		double x = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS;
+		double topY = getHeight()/2 - BODY_LENGTH;
+		double bottomY = topY + BODY_LENGTH;
+		GLine body = new GLine (x, topY, x, bottomY);
+		add(body);
+	}
+	
+	private void drawLeftArm() {
+		double armStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS;
+		double armEndX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS - UPPER_ARM_LENGTH;
+		double upperArmHeightY = getHeight()/2 - BODY_LENGTH + ARM_OFFSET_FROM_HEAD;
+		GLine upperLeftArm = new GLine (armStartX, upperArmHeightY, armEndX, upperArmHeightY);
+		add(upperLeftArm);
+		double lowerArmEndY = upperArmHeightY + LOWER_ARM_LENGTH;
+		GLine lowerLeftArm = new GLine (armEndX, upperArmHeightY, armEndX, lowerArmEndY);
+		add(lowerLeftArm);
+	}
+	
+	private void drawRightArm() {
+		double armStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS;
+		double armEndX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS + UPPER_ARM_LENGTH;
+		double upperArmHeightY = getHeight()/2 - BODY_LENGTH + ARM_OFFSET_FROM_HEAD;
+		GLine upperRightArm = new GLine (armStartX, upperArmHeightY, armEndX, upperArmHeightY);
+		add(upperRightArm);
+		double lowerArmEndY = upperArmHeightY + LOWER_ARM_LENGTH;
+		GLine lowerRightArm = new GLine (armEndX, upperArmHeightY, armEndX, lowerArmEndY);
+		add(lowerRightArm);
+	}
+	
+	private void drawLeftLeg() {
+		double hipStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS;
+		double hipEndX = hipStartX - HIP_WIDTH;
+		double hipHeightY = getHeight()/2;
+		GLine leftHip = new GLine(hipStartX, hipHeightY, hipEndX, hipHeightY);
+		add(leftHip);
+		double leftLegY = hipHeightY + LEG_LENGTH;
+		GLine leftLeg = new GLine(hipEndX, hipHeightY, hipEndX, leftLegY);
+		add(leftLeg);
+		
+	}
+	
+	private void drawRightLeg() {
+		double hipStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS;
+		double hipEndX = hipStartX + HIP_WIDTH;
+		double hipHeightY = getHeight()/2;
+		GLine leftHip = new GLine(hipStartX, hipHeightY, hipEndX, hipHeightY);
+		add(leftHip);
+		double leftLegEndY = hipHeightY + LEG_LENGTH;
+		GLine leftLeg = new GLine(hipEndX, hipHeightY, hipEndX, leftLegEndY);
+		add(leftLeg);
+	}
+	
+	private void drawLeftFoot() {
+		double footStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS - HIP_WIDTH;
+		double footEndX = footStartX - FOOT_LENGTH;
+		double footHeightY = getHeight()/2 + LEG_LENGTH;
+		GLine leftFoot = new GLine(footStartX, footHeightY, footEndX, footHeightY);
+		add(leftFoot);
+	}
+	
+	private void drawRightFoot() {
+		double footStartX = getWidth()/2 + UPPER_ARM_LENGTH/2 + HEAD_RADIUS + HIP_WIDTH;
+		double footEndX = footStartX + FOOT_LENGTH;
+		double footHeightY = getHeight()/2 + LEG_LENGTH;
+		GLine rightFoot = new GLine(footStartX, footHeightY, footEndX, footHeightY);
+		add(rightFoot);
 	}
 
+	private String incorrectGuess;
+	private GLabel word;
+	private GLabel incorrectWord;
 /* Constants for the simple version of the picture (in pixels) */
 	private static final int SCAFFOLD_HEIGHT = 360;
 	private static final int BEAM_LENGTH = 144;
